@@ -48,8 +48,9 @@ function getFailingTaskIds(){
 function getFailingTestNames(task_id){
     const url = 'https://evergreen.mongodb.com/rest/v2/tasks/' + task_id + '/tests'
     const tests = rest(url)
-	const failing_test_names = tests.filter(test => test.status == 'fail').map(test => test.test_file)
-	return failing_test_names
+    // Relevant output format: [ {test_file: 'jstests/something.js'}, ... ]
+    const failing_test_names = tests.filter(test => test.status == 'fail').map(test => test.test_file)
+    return failing_test_names
 }
 
 const failing_tasks_ids = getFailingTaskIds()
@@ -60,20 +61,20 @@ const failing_tests = {}
 failing_tasks_ids.forEach(function(task_id){
     console.log('Processing failing tasks: ' + i++ + '/' + numFailingTasks + ' ...')
     const testNames = getFailingTestNames(task_id)
-	testNames.forEach(function(name){
+    testNames.forEach(function(name){
         if(!failing_tests[name]){
             failing_tests[name] = [task_id]
-		} else {
+        } else {
             failing_tests[name].push(task_id)
-		}
-	})
+        }
+    })
 })
 
 console.log('\n===========\n')
 
 Object.keys(failing_tests).forEach(function(test){
     console.log('--- Test: \033[1m' + test + '\033[0m')
-	console.log('--- Failed in \033[1m' + failing_tests[test].length + '\033[0m variants/suites:')
+    console.log('--- Failed in \033[1m' + failing_tests[test].length + '\033[0m variants/suites:')
     failing_tests[test].forEach(suite => console.log('- ' + suite))
-	console.log('\n')
+    console.log('\n')
 })
