@@ -5,11 +5,9 @@ Given an evergreen patch id, download and group failures info by test name 🌲
 nodejs evg_get_failing_tests.js --patch_id <patch_id>
 ```
 
-For example: `nodejs evg_get_failing_tests.js --patch_id 623ca7391e2d176c5d5653d1`
-
-#### Output example
+#### Example
 ```shell
-nodejs evg_get_failing_tests.js --patch_id 623ca7391e2d176c5d5653d1
+$ nodejs evg_get_failing_tests.js --patch_id 623ca7391e2d176c5d5653d1
 Processing failing tasks: 1/12 ...
 Processing failing tasks: 2/12 ...
 Processing failing tasks: 3/12 ...
