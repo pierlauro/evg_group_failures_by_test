@@ -1,5 +1,10 @@
 Given an [evergreen](https://github.com/evergreen-ci/evergreen/) patch id, download and group failures info by test name 🌲 Data are retrieved using evergreen's [REST V2 APIs](https://github.com/evergreen-ci/evergreen/wiki/REST-V2-Usage).
 
+#### Node dependencies
+- minimist
+- read-yaml-file
+- sync-request
+
 #### Usage
 ```javascript
 nodejs evg_get_failing_tests.js --patch_id <patch_id> [--throttle_ms <millis|2000>]
