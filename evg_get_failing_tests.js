@@ -1,12 +1,21 @@
 const minimalist = require('minimist')     // to parse cmd line arguments
 const readYaml = require('read-yaml-file') // to read EVG conf file
 const request = require('sync-request')    // to perform sync HTTP requests
+const {promisify} = require('util')
+const sleep = promisify(setTimeout)        // to throttle requests
+
+function printUsage(){
+    console.log('Usage: nodejs evg_get_failing_tests.js --patch_id <patch id> [--throttle_ms <millis>]');
+}
 
 const argv = minimalist(process.argv.slice(2))
 const patch_id = argv.patch_id
 if(!patch_id){
-    throw 'Missing required argument `--patch_id <patch id>`'
+    printUsage();
+    throw 'Missing required argument patch_id'
 }
+
+const throttling_ms = argv.throttle_ms || 2000;
 
 const evgData = readYaml.sync(require('os').homedir() + '/.evergreen.yml');
 if(!evgData){
@@ -56,25 +65,30 @@ function getFailingTestNames(task_id){
 const failing_tasks_ids = getFailingTaskIds()
 const numFailingTasks = failing_tasks_ids.length;
 
-var i = 1;
+var numProcessedTasks = 1;
 const failing_tests = {}
-failing_tasks_ids.forEach(function(task_id){
-    console.log('Processing failing tasks: ' + i++ + '/' + numFailingTasks + ' ...')
-    const testNames = getFailingTestNames(task_id)
-    testNames.forEach(function(name){
-        if(!failing_tests[name]){
-            failing_tests[name] = [task_id]
-        } else {
-            failing_tests[name].push(task_id)
-        }
+
+const processFailingTasksWithThrottling = async (millis) => {
+    for(const task_id of failing_tasks_ids){
+        console.log('Processing failing tasks: ' + numProcessedTasks++ + '/' + numFailingTasks + ' ...')
+        const testNames = getFailingTestNames(task_id)
+        testNames.forEach(function(name){
+            if(!failing_tests[name]){
+                failing_tests[name] = [task_id]
+            } else {
+                failing_tests[name].push(task_id)
+            }
+        })
+        await sleep(millis)
+    }
+
+    console.log('\n===========\n')
+    Object.keys(failing_tests).forEach(function(test){
+        console.log('--- Test: \033[1m' + test + '\033[0m')
+        console.log('--- Failed in \033[1m' + failing_tests[test].length + '\033[0m variants/suites:')
+        failing_tests[test].forEach(suite => console.log('- ' + suite))
+        console.log('\n')
     })
-})
+}
 
-console.log('\n===========\n')
-
-Object.keys(failing_tests).forEach(function(test){
-    console.log('--- Test: \033[1m' + test + '\033[0m')
-    console.log('--- Failed in \033[1m' + failing_tests[test].length + '\033[0m variants/suites:')
-    failing_tests[test].forEach(suite => console.log('- ' + suite))
-    console.log('\n')
-})
+processFailingTasksWithThrottling(throttling_ms)

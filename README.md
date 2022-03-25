@@ -2,7 +2,7 @@ Given an [evergreen](https://github.com/evergreen-ci/evergreen/) patch id, downl
 
 #### Usage
 ```javascript
-nodejs evg_get_failing_tests.js --patch_id <patch_id>
+nodejs evg_get_failing_tests.js --patch_id <patch_id> [--throttle_ms <millis|2000>]
 ```
 
 #### Example
