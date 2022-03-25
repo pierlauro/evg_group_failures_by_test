@@ -59,7 +59,8 @@ function getFailingTestNames(task_id){
     const tests = rest(url)
     // Relevant output format: [ {test_file: 'jstests/something.js'}, ... ]
     const failing_test_names = tests.filter(test => test.status == 'fail').map(test => test.test_file)
-    return failing_test_names
+    // Convert '\' to '/'. (On windows variants test names have '\')
+    return failing_test_names.map(test_name => test_name.replace(/\\/g, '/'))
 }
 
 const failing_tasks_ids = getFailingTaskIds()
