@@ -7,6 +7,11 @@ Given an [evergreen](https://github.com/evergreen-ci/evergreen/) patch id, downl
 - read-yaml-file
 - sync-request
 
+To install dependencies:
+```
+npm install
+```
+
 #### Usage
 ```javascript
 nodejs evg_get_failing_tests.js --patch_id <patch_id> [--throttle_ms <millis|2000>]
