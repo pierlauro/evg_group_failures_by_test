@@ -1,0 +1,9 @@
+{
+  "name": "evg_group_failures_by_test",
+  "version": "0.0.0",
+  "dependencies": [
+    "minimist",
+    "read-yaml-file",
+    "sync-request"
+  ]
+}
